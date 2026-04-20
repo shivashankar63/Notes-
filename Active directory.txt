@@ -1,0 +1,15 @@
+Active directory 
+ AD is the identity provider (IdP)
+
+The flow looks like this:
+User logs into Windows (authenticates against AD)
+AD issues a Kerberos ticket (a secure token)
+When the user opens another app (e.g., SharePoint, Outlook), the app checks the Kerberos ticket
+AD confirms identity → access granted, no second login needed
+Kerberos — the core protocol AD uses for SSO within a Windows network
+LDAP — used to query the AD directory
+SAML / OAuth / OIDC — used when extending AD-based SSO to web/cloud apps (via Azure AD / Microsoft Entra ID)
+
+https://www.okta.com/blog/identity-security/single-sign-on-sso/
+
+Federated Identity: Federated identity is a method of linking a user’s identity across multiple separate identity management systems. It allows users to quickly move between systems while maintaining security.
