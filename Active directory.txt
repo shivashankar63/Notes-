@@ -1,4 +1,4 @@
-Active directory 
+Active directory   https://youtu.be/7sUAVY6xK9s?si=xWzcHoe3h1L4p1dB 
  AD is the identity provider (IdP)
 
 The flow looks like this:
