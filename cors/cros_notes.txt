@@ -1,0 +1,70 @@
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+
+
+This cross-origin sharing standard can enable cross-origin HTTP requests for:
+
+Invocations of fetch() or XMLHttpRequest, as discussed above.
+Web Fonts (for cross-domain font usage in @font-face within CSS), as described in the font fetching requirements, so that servers can deploy TrueType fonts that can only be loaded cross-origin and used by websites that are permitted to do so.
+WebGL textures.
+Images/video frames drawn to a canvas using drawImage().
+CSS Shapes from images.
+This is a general article about Cross-Origin Resource Sharing and includes a discussion of the necessary HTTP headers.
+
+Functional overview
+The Cross-Origin Resource Sharing standard works by adding new HTTP headers that let servers describe which origins are permitted to read that information from a web browser. Additionally, for HTTP request methods that can cause side-effects on server data (in particular, HTTP methods other than GET, or POST with certain MIME types), the specification mandates that browsers "preflight" the request, soliciting supported methods from the server with the HTTP OPTIONS request method, and then, upon "approval" from the server, sending the actual request. Servers can also inform clients whether "credentials" (such as Cookies and HTTP Authentication) should be sent with requests.
+
+CORS failures result in errors but for security reasons, specifics about the error are not available to JavaScript. All the code knows is that an error occurred. The only way to determine what specifically went wrong is to look at the browser's console for details.
+
+Subsequent sections discuss scenarios, as well as provide a breakdown of the HTTP headers used.
+
+Examples of access control scenarios
+We present three scenarios that demonstrate how Cross-Origin Resource Sharing works. All these examples use fetch(), which can make cross-origin requests in any supporting browser.
+
+Simple requests
+Some requests don't trigger a CORS preflight. Those are called simple requests from the obsolete CORS spec, though the Fetch spec (which now defines CORS) doesn't use that term.
+
+The motivation is that the <form> element from HTML 4.0 (which predates cross-site fetch() and XMLHttpRequest) can submit simple requests to any origin, so anyone writing a server must already be protecting against cross-site request forgery (CSRF). Under this assumption, the server doesn't have to opt-in (by responding to a preflight request) to receive any request that looks like a form submission, since the threat of CSRF is no worse than that of form submission. However, the server still must opt-in using Access-Control-Allow-Origin to share the response with the script.
+
+A simple request is one that meets all the following conditions:
+
+One of the allowed methods:
+
+GET
+HEAD
+POST
+Apart from the headers automatically set by the user agent (for example, Connection, User-Agent, or the forbidden request headers), the only headers which are allowed to be manually set are the CORS-safelisted request-headers, which are:
+
+Accept
+Accept-Language
+Content-Language
+Content-Type (please note the additional requirements below)
+Range (only with a single range header value; e.g., bytes=256- or bytes=127-255)
+The only type/subtype combinations allowed for the media type specified in the Content-Type header are:
+
+application/x-www-form-urlencoded
+multipart/form-data
+text/plain
+If the request is made using an XMLHttpRequest object, no event listeners are registered on the object returned by the XMLHttpRequest.upload property used in the request; that is, given an XMLHttpRequest instance xhr, no code has called xhr.upload.addEventListener() to add an event listener to monitor the upload.
+
+No ReadableStream object is used in the request.
+
+Note: WebKit Nightly and Safari Technology Preview place additional restrictions on the values allowed in the Accept, Accept-Language, and Content-Language headers. If any of those headers have "nonstandard" values, WebKit/Safari does not consider the request to be a "simple request". What values WebKit/Safari consider "nonstandard" is not documented, except in the following WebKit bugs:
+
+Require preflight for non-standard CORS-safelisted request headers Accept, Accept-Language, and Content-Language
+Allow commas in Accept, Accept-Language, and Content-Language request headers for simple CORS
+Switch to a blacklist model for restricted Accept headers in simple CORS requests
+No other browsers implement these extra restrictions because they're not part of the spec.
+
+For example, suppose web content at https://foo.example wishes to fetch JSON content from domain https://bar.other. Code of this sort might be used in JavaScript deployed on foo.example:
+
+js
+
+Copy
+const fetchPromise = fetch("https://bar.other");
+
+fetchPromise
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+  });
+This operation performs a simple exchange between the client and the server, using CORS headers to handle the privileges:
